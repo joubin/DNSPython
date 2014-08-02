@@ -18,8 +18,6 @@ def commandLineInt():
     parser.add_argument("--file", help="Name of the file to use with option (3) of level")
     args = parser.parse_args()
 
-    # print args.level
-    print args.domain
     if args.level == "3" and  args.file == None:
         parser.print_help()
         sys.exit()
