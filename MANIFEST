@@ -3,6 +3,7 @@ LICENSE.txt
 README.txt
 setup.py
 dnspython/DNServer.py
+dnspython/__init__.py
 dnspython/color.py
 dnspython/dns.py
 dnspython/main.py

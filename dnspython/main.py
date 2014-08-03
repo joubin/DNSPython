@@ -63,6 +63,7 @@ def main():
             print "%4s" % bcolors.FAIL + str(k) + bcolors.ENDC,"\t", "%15s" %str(v),"\t",  "%15s" % num
 
 
-if __name__ == '__main__':
- commandLineInt()
- main()
+
+
+commandLineInt()
+main()

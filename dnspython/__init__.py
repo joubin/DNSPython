@@ -1,1 +1,2 @@
-__init__.py
+__all__ = ['color', 'dns', 'DNServer', 'main']
+import main
