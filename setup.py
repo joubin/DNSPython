@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='dnspython-lookup',
-    version='0.1.15',
+    version='0.1.16',
     author='Joubin Jabbari',
     author_email='joubin.j@gmail.com',
     packages=['dnspython'],
