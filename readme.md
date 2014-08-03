@@ -2,6 +2,10 @@
 
 DNSPython is a simple command line interface to check on the status of your world wide resolutions. 
 
+##### Installation:
+<pre>
+pip install dnspython-lookup
+</pre>
 ##### Usage:
 
 <pre>
