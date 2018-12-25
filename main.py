@@ -1,68 +1,116 @@
 #!/usr/bin/env python
 
-from dns import *
 import argparse
-import signal
-import sys
+import csv
+from future.standard_library import install_aliases
+
+install_aliases()
+from threading import Thread
+from queue import Queue, Empty
 
 
+from dnspython.Domain import Domain
+from dnspython.NameServer import NameServer
+from dnspython.NameServerCollection import NameServerCollection
+from dnspython.dns import *
 
-dnsList = {}
+collection = None
 urlArgument = 1
 args = None
+parse = None
+
+
 def commandLineInt():
     global args
+    global parser
     parser = argparse.ArgumentParser()
-    parser.add_argument("--level", "-l", default="1", help="This option allows you to: (1) use a large database of DNS Servers. (2) Use just the google DNS Servers. (3) Use your own server list. <Requires properly formatted file> ")
+    parser.add_argument("--level", "-l", default="1",
+                        help="This option allows you to: (1) use a large database of DNS Servers from public-dns.info "
+                             "(2) Use just the google DNS Servers. (3) Use your own server list. <Requires properly "
+                             "formatted file> ")
+    parser.add_argument("--file", "-f", help="If provided, it will output to the file instead of console. File must be a csv")
+
     parser.add_argument("domain", help="The domain that you would like to use. ")
-    parser.add_argument("--file", help="Name of the file to use with option (3) of level")
+    parser.add_argument("--url", help="URL to use with option (3) of level")
     args = parser.parse_args()
 
-    if args.level == "3" and  args.file == None:
+    if args.level == "3" and args.url is None:
         parser.print_help()
-        sys.exit()
-def setup(level):
-    if level == "1":
-        import json
-        import urllib2
-        import DNServer
-        data = urllib2.urlopen('http://joubin.me/nameservers.json')
+        sys.exit(-1)
 
-        j = json.load(data)
-        server = []
-        for i in j:
-            tmp = DNServer.DNServer(i)
-            server.append(tmp)
+    if args.file is not None:
+        if not str(args.file).endswith("csv"):
+            parser.print_help()
+            sys.exit(-1)
 
-        for i in server:
-            if i.isValid():
-                dnsList[i.getCountry()] = i.getIP()
-    elif level == "2":
-        dnsList["Google 1"] = "8.8.8.8"
-        dnsList["Google 2"] = "8.8.4.4"
-    elif level == "3":
-        print "Option coming soon"
-        sys.exit(1)
+
+
+def setup():
+    global args
+    global collection
+    if args.level == "1":
+        collection = NameServerCollection.CollectionFromCSVURL(url="https://public-dns.info/nameservers.csv")
+    elif args.level == "2":
+        collection = NameServerCollection()
+        collection.add_server(NameServer(ip="8.8.8.8", name="Google 1", country_id="US"))
+        collection.add_server(NameServer(ip="8.8.4.4", name="Google 2", country_id="US"))
+    elif args.level == "3":
+        collection = NameServerCollection.CollectionFromCSVURL(url=args.url)
     else:
-        print bcolors.FAIL + str("Unknown option \"%s\"" % level) + bcolors.ENDC
-        sys.exit(1)
+        parser.print_help()
+        sys.exit(-1)
         
+def console(domain):
+    print("Result for {0}".format(str(domain.url)))
+    print("{country} {ip} {result}".format(country="Country".rjust(7),
+                                           ip="DNS Server".rjust(24),
+                                           result="Result".rjust(22)))
+    while domain.status.empty():
+        try:
+            mapping = domain.results.get(block=True, timeout=2)
+            if mapping is not None:
+                for record in mapping.records:
+                    print(
+                        "{country} \t{ip} \t\t{Result}".format(country=str(mapping.name_server.country_id).rjust(7),
+                                                               ip=str(mapping.name_server.ip).rjust(20),
+                                                               Result=str(record).rjust(15)))
+        except Empty:
+            pass
+
+
+def output_csv(domain):
+    with open(args.file, 'w') as outputfile:
+        writer = csv.writer(outputfile)
+        writer.writerow(["Country", "DNS Server", "Result", "Response Timne"])
+        while domain.status.empty():
+            try:
+                mapping = domain.results.get(block=True, timeout=2)
+                if mapping is not None:
+                    for record in mapping.records:
+                        writer.writerow([mapping.name_server.country_id, mapping.name_server.ip, record, mapping.response_time])
+            except queue.Empty:
+                pass
+
 
 
 def main():
-    setup(args.level)
-    print "Result for " + str(args.domain)
-    print "Country", "\tDNS IP", "\t\tResult"
-    for k,v in dnsList.items():
-        try:
-            num = lookup(str(args.domain), v)[0]
-            print "%4s" % bcolors.OKGREEN + str(k) + bcolors.ENDC,"\t", "%15s" %str(v),"\t", "%15s" % num
-        except Exception, e:
-            if e == KeyboardInterrupt:
-                sys.exit(1)
-            print "%4s" % bcolors.FAIL + str(k) + bcolors.ENDC,"\t", "%15s" %str(v),"\t",  "%15s" % num
+    setup()
+    domain = Domain(url=args.domain)
+    t = Thread(target=domain.lookup, args=(collection,))
+    t.start()
+    try:
+        if args.file is None:
+            console(domain=domain)
+        else:
+            output_csv(domain=domain)
+
+    except KeyboardInterrupt:
+        t.join(timeout=1)
+        sys.exit(-1)
+    t.join()
+
 
 
 if __name__ == '__main__':
- commandLineInt()
- main()
+    commandLineInt()
+    main()

@@ -1,35 +1,42 @@
 #!/usr/bin/env python
-
 import subprocess as sp
 import sys
-from color import *
+import re
+import time
 
-def lookup(a,b):
+nslookup_regex = re.compile(r"(Address):(\t| )?(\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})$")
+ip_address = re.compile('(\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})')
+
+
+def nslookup(domain, nameserver_ip):
     try:
-        address = []
-        c = "nslookup"
-        cleanAddress = []
-        p = sp.Popen([c, a, b], stdin=sp.PIPE, stdout=sp.PIPE, close_fds=True)
 
-        (stdout, stdin, stderr) = (p.stdout, p.stdin, p.stderr)
-        data = stdout.readline()
-        while data:
-            # Do stuff with data, linewise.
+        command = "nslookup"
+        start = time.time()
+        process = sp.Popen([command, domain, nameserver_ip], stdin=sp.PIPE, stdout=sp.PIPE, close_fds=True)
+        end = time.time()
 
-            data = stdout.read().split()
-            for i in range(0, len(data)):
-                if data[i] == "Address:":
-                    address.append((data[i], data[i+1]))
-        stdout.close()
-        stdin.close()
+        (stdout, stdin, stderr) = (process.stdout, process.stdin, process.stderr)
 
-        for i in address:
-            if b not in i[1]:
-                cleanAddress.append(i[1])
+        data = stdout.readlines()
+        data = [line.decode('utf-8') for line in data]
+        data = list(filter(nslookup_regex.match, data))
+        ips = []
 
-        del(address)
-        return cleanAddress
+        for response in data:
+            match = ip_address.search(response)
+            if match:
+                try:
+                    ips.append(match.groups(1)[0])
+                except IndexError:
+                    pass # We don't care if we cant get some of the ips, but this really should happen
+        return list(set(ips)), end - start
+
     except KeyboardInterrupt:
-        print "Exiting..."
+        print("Exiting...")
         sys.exit(1)
 
+
+if __name__ == '__main__':
+    result = nslookup("google.com", "8.8.8.8")
+    print(result)

@@ -3,15 +3,15 @@
 
 class DNServer(object):
     """docstring for DNServer"""
+
     def __init__(self, arg):
-        super(DNServer, self).__init__()
         self.arg = arg
         self.info = {}
-        self.unPack()
-    
-    def unPack(self):
+        self.unpack()
+
+    def unpack(self):
         for k, v in self.arg.items():
-            if v != "" or v != '' or v != None:
+            if v != "" or v != '' or v is not None:
                 self.info[k] = v
 
     def isValid(self):
@@ -20,8 +20,8 @@ class DNServer(object):
         else:
             return False
 
-    def getCountry(self):
+    def get_country(self):
         return self.info["country_id"]
 
-    def getIP(self):
+    def get_ip(self):
         return self.info["ip"]
