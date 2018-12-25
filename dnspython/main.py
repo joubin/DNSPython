@@ -6,7 +6,7 @@ from future.standard_library import install_aliases
 
 install_aliases()
 from threading import Thread
-from queue import Queue, Empty
+from queue import Empty
 
 
 from dnspython.Domain import Domain
@@ -88,15 +88,17 @@ def output_csv(domain):
                 if mapping is not None:
                     for record in mapping.records:
                         writer.writerow([mapping.name_server.country_id, mapping.name_server.ip, record, mapping.response_time])
-            except queue.Empty:
+            except Empty:
                 pass
 
 
 
 def main():
+    commandLineInt()
     setup()
     domain = Domain(url=args.domain)
     t = Thread(target=domain.lookup, args=(collection,))
+    t.daemon = True
     t.start()
     try:
         if args.file is None:
@@ -112,5 +114,4 @@ def main():
 
 
 if __name__ == '__main__':
-    commandLineInt()
     main()

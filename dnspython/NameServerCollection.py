@@ -40,10 +40,9 @@ class NameServerCollection(DNSPythonBase):
         final = []
         for line in response.readlines():
             try:
-                final.append(line.decode('latin-1'))
+                final.append(line.decode('utf-8').encode('utf-8'))
             except (UnicodeDecodeError, UnicodeEncodeError) as e:
                 pass # We cant decode something
-        print(final)
         return cls.CollectionFromCSV(csv_data=final)
 
 
