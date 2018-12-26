@@ -5,14 +5,14 @@ import setuptools
 
 setup(
     name='dnslookup',
-    version='0.7.32',
+    version='0.7.35',
     author='Joubin Jabbari',
     author_email='joubin.j@gmail.com',
     url="https://github.com/joubin/DNSPython",
     license='LICENSE.txt',
       entry_points={
           'console_scripts':
-              ['dnslookup= dnslookup.main:main']},
+              ['dnslookup= dnslookup.__main__:main']},
     description='Check dns entries across the world. In short, if you move your server from one IP to another, you can check to see when most of the dns servers in the world have update their results.',
     long_description="""### DNSlookup 
 

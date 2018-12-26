@@ -1,7 +1,7 @@
-from dnslookup.DNSPythonBase import DNSPythonBase
+from dnslookup.DNSLookupBase import DNSLookupBase
 
 
-class NameServer(DNSPythonBase):
+class NameServer(DNSLookupBase):
     def __init__(self, ip, name, country_id, city=None, version=None, error=None, dnssec=None, reliability=None,
                  checked_at=None, created_at=None):
         self.ip = ip

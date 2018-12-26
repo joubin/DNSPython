@@ -33,7 +33,7 @@ def commandLineInt():
                         help="If provided, it will output to the file instead of console. File must be a csv")
 
     parser.add_argument("domain", help="The domain that you would like to use. ")
-    parser.add_argument("--url", help="URL to use with option (3) of level")
+    parser.add_argument("--url", help="URL to use with option (3) of level. It could be a file or a url")
     args = parser.parse_args()
 
     if args.level == "3" and args.url is None:
@@ -56,6 +56,7 @@ def setup():
         collection.add_server(NameServer(ip="8.8.8.8", name="Google 1", country_id="US"))
         collection.add_server(NameServer(ip="8.8.4.4", name="Google 2", country_id="US"))
     elif args.level == "3":
+        print(args.url)
         collection = NameServerCollection.CollectionFromCSVURL(url=args.url)
     else:
         parser.print_help()

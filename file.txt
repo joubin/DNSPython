@@ -1,4 +1,4 @@
-/usr/local/lib/python2.7/site-packages/dnspython-0.2.22-py2.7.egg
-/usr/local/bin/dnspython
+/usr/local/lib/python2.7/site-packages/dnslookup-0.7.33-py2.7.egg
+/usr/local/bin/dnslookup
 /usr/local/bin/pasteurize
 /usr/local/bin/futurize

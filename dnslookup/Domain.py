@@ -1,19 +1,19 @@
 from future.standard_library import install_aliases
 
 from dnslookup import dns
-from dnslookup.DNSPythonBase import DNSPythonBase
+from dnslookup.DNSLookupBase import DNSLookupBase
 
 from queue import Queue
 
 
-class DomainDNSRecord(DNSPythonBase):
+class DomainDNSRecord(DNSLookupBase):
     def __init__(self, name_server, records, response_time):
         self.name_server = name_server
         self.records = records
         self.response_time = response_time
 
 
-class Domain(DNSPythonBase):
+class Domain(DNSLookupBase):
     def __init__(self, url):
         self.url = url
         self.results = Queue()

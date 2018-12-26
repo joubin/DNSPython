@@ -1,10 +1,10 @@
 # encoding=utf8
 
-from dnslookup.DNSPythonBase import DNSPythonBase
+from dnslookup.DNSLookupBase import DNSLookupBase
 from dnslookup.NameServer import NameServer
 
 
-class NameServerCollection(DNSPythonBase):
+class NameServerCollection(DNSLookupBase):
     def __init__(self):
         self.collection = {}
 
@@ -30,15 +30,13 @@ class NameServerCollection(DNSPythonBase):
 
     @classmethod
     def CollectionFromCSVURL(cls, url):
-        from future.standard_library import install_aliases
-        install_aliases()
-        from urllib.request import urlopen
-        response = urlopen(url)
-        # response = [str(line.decode('utf-8')) for line in response.readlines()]
-        final = []
-        for line in response.readlines():
-            try:
-                final.append(line.decode('utf-8').encode('utf-8'))
-            except (UnicodeDecodeError, UnicodeEncodeError) as e:
-                pass  # We cant decode something
-        return cls.CollectionFromCSV(csv_data=final)
+        if str(url).lower().startswith("http"):
+           response = cls.get_url_content(url)
+
+        else:
+            with open(url, 'r') as input_file:
+                response = input_file.readlines()
+
+
+
+        return cls.CollectionFromCSV(csv_data=response)
