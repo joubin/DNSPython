@@ -1,15 +1,15 @@
-### DNSPython 
+### DNSlookup 
 
-DNSPython is a simple command line interface to check on the status of your world wide resolutions. 
+dnslookup is a simple command line interface to check on the status of your world wide resolutions. It relies on the system installed nslookup to make requests.  
 
 ##### Installation:
 <pre>
-pip install dnspython-lookup
+pip install dnslookup
 </pre>
 ##### Usage:
 
 <pre>
-dnspython-lookup facebook.com
+dnslookup facebook.com
 Result for facebook.com
 Country 	DNS IP 		Result
 BD 	203.112.202.195 	 173.252.110.27
@@ -22,9 +22,6 @@ JM 	    200.9.115.2 	 173.252.110.27
 </pre>
 
 <pre>
-dnspython-lookup --help
-usage: main.py [-h] [--level LEVEL] [--file FILE] domain
-
 positional arguments:
   domain                The domain that you would like to use.
 
@@ -32,10 +29,13 @@ optional arguments:
   -h, --help            show this help message and exit
   --level LEVEL, -l LEVEL
                         This option allows you to: (1) use a large database of
-                        DNS Servers. (2) Use just the google DNS Servers. (3)
-                        Use your own server list. <Requires properly formatted
-                        file>
-  --file FILE           Name of the file to use with option (3) of level
+                        DNS Servers from public-dns.info (2) Use just the
+                        google DNS Servers. (3) Use your own server list.
+                        <Requires properly formatted file>
+  --file FILE, -f FILE  If provided, it will output to the file instead of
+                        console. File must be a csv
+  --url URL             URL to use with option (3) of level
+
 </pre>
 
 

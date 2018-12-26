@@ -3,16 +3,17 @@
 import argparse
 import csv
 from future.standard_library import install_aliases
-
 install_aliases()
+
 from threading import Thread
 from queue import Empty
 
+from dnslookup.Domain import Domain
+from dnslookup.NameServer import NameServer
+from dnslookup.NameServerCollection import NameServerCollection
+from dnslookup.dns import *
 
-from dnspython.Domain import Domain
-from dnspython.NameServer import NameServer
-from dnspython.NameServerCollection import NameServerCollection
-from dnspython.dns import *
+
 
 collection = None
 urlArgument = 1
@@ -28,7 +29,8 @@ def commandLineInt():
                         help="This option allows you to: (1) use a large database of DNS Servers from public-dns.info "
                              "(2) Use just the google DNS Servers. (3) Use your own server list. <Requires properly "
                              "formatted file> ")
-    parser.add_argument("--file", "-f", help="If provided, it will output to the file instead of console. File must be a csv")
+    parser.add_argument("--file", "-f",
+                        help="If provided, it will output to the file instead of console. File must be a csv")
 
     parser.add_argument("domain", help="The domain that you would like to use. ")
     parser.add_argument("--url", help="URL to use with option (3) of level")
@@ -42,7 +44,6 @@ def commandLineInt():
         if not str(args.file).endswith("csv"):
             parser.print_help()
             sys.exit(-1)
-
 
 
 def setup():
@@ -59,7 +60,8 @@ def setup():
     else:
         parser.print_help()
         sys.exit(-1)
-        
+
+
 def console(domain):
     print("Result for {0}".format(str(domain.url)))
     print("{country} {ip} {result}".format(country="Country".rjust(7),
@@ -87,10 +89,10 @@ def output_csv(domain):
                 mapping = domain.results.get(block=True, timeout=2)
                 if mapping is not None:
                     for record in mapping.records:
-                        writer.writerow([mapping.name_server.country_id, mapping.name_server.ip, record, mapping.response_time])
+                        writer.writerow(
+                            [mapping.name_server.country_id, mapping.name_server.ip, record, mapping.response_time])
             except Empty:
                 pass
-
 
 
 def main():
@@ -110,7 +112,6 @@ def main():
         t.join(timeout=1)
         sys.exit(-1)
     t.join()
-
 
 
 if __name__ == '__main__':

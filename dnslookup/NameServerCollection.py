@@ -1,20 +1,18 @@
 # encoding=utf8
 
-from dnspython.DNSPythonBase import DNSPythonBase
-from dnspython.NameServer import NameServer
-
+from dnslookup.DNSPythonBase import DNSPythonBase
+from dnslookup.NameServer import NameServer
 
 
 class NameServerCollection(DNSPythonBase):
     def __init__(self):
         self.collection = {}
 
-
     def add_server(self, name_server):
         self.collection[name_server.ip] = name_server
 
     def lookup(self, domain):
-        import dnspython.dns as dns
+        import dnslookup.dns as dns
         for name_server in self.collection:
             ips = dns.nslookup(domain=domain, nameserver_ip=name_server.ip)
 
@@ -42,7 +40,5 @@ class NameServerCollection(DNSPythonBase):
             try:
                 final.append(line.decode('utf-8').encode('utf-8'))
             except (UnicodeDecodeError, UnicodeEncodeError) as e:
-                pass # We cant decode something
+                pass  # We cant decode something
         return cls.CollectionFromCSV(csv_data=final)
-
-

@@ -1,4 +1,4 @@
-from dnspython.DNSPythonBase import DNSPythonBase
+from dnslookup.DNSPythonBase import DNSPythonBase
 
 
 class NameServer(DNSPythonBase):
